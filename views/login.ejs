@@ -1,0 +1,28 @@
+<%- include('partials/head', { pageTitle: 'logueo' }) %>
+<%- include('partials/navbar') %>
+
+<div class=" d-flex flex-column align-items-center justify-content-center">
+
+    <h1 class="mb-4 mt-4">Página de logueo</h1>
+    <img src="/public/assets/logueo_sims.png" alt="logeo sims" width="50px" class="mb-4" id="tinte">
+
+    <!-- Formulario para enviar el método POST de HTTP -->
+    <form action="/login" method="POST" class="d-flex flex-column align-items-center gap-3">
+
+        <div>
+            <label for="usernameElementID">Nombre</label>
+            <input name="username" id="usernameElementID" value="nombre" class="form-control" required />
+        </div>
+
+        <div>
+            <label for="passwordElementID">Clave</label>
+            <input name="password" type="password" id="passwordElementID" value="clave" class="form-control" required />
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary mt-2">Enviar saludos</button>
+        </div>
+    </form>
+    <br>
+    <p>¿No tienes una cuenta? <a href="signup">Regístrate aquí</a></p>
+</div>
+

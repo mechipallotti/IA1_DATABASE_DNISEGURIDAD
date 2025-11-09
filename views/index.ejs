@@ -1,0 +1,26 @@
+
+<%- include('partials/head', { pageTitle: 'Inicio' }) %>
+<%- include('partials/navbar') %>
+<body>
+  <main class="container-fluid main-index">
+    <section>
+      <h1>Una plataforma colaborativa para crear tu dni de seguridad</h1>
+      <p>Creá tu avatar, explorá los espacios de experimentación y participá con tu dni de seguridad.</p>
+     
+
+      <% if (!session || !session.user) { %>
+        <div class="btn mt-3">
+          <a href="/login" class="btn">Entrar</a>
+          <a href="/signup" class="btn btn-alt">Registrarse</a>
+        </div>
+      <% } else { %>
+        <div class="btn mt-3">
+          <a href="/obra" class="btn">Galeria</a>
+          <a href="/user" class="btn btn-alt">Tu perfil</a>
+        </div>
+      <% } %>
+    </section>
+  </main>
+</body>
+
+</html>

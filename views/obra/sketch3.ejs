@@ -1,0 +1,114 @@
+<%- include('../partials/head', { pageTitle: 'Galería Colectiva' }) %>
+<%- include('../partials/navbar') %>
+
+
+<main>
+  <h1 class="text-center mt-4 mb-4">Galería Colectiva - Webcam Pixelada</h1>
+  
+  <!-- Canvas p5.js -->
+  <div id="sketch-container"></div>
+  
+  <!-- Formulario de carga -->
+  <div class="gallery-section">
+    <div class="upload-form">
+      <h3>Subir tu captura a la galería</h3>
+      <p class="text-muted">Guardaste una imagen desde la webcam? Subila acá para compartirla</p>
+      <form action="/obra/sketch3/upload" method="POST" enctype="multipart/form-data" class="mt-3">
+        <input type="file" name="image" accept="image/*" required class="form-control d-inline-block" style="max-width: 400px;">
+        <button type="submit" class="btn btn-primary ms-2">Subir a galería</button>
+      </form>
+    </div>
+
+    <!-- Galería de imágenes -->
+    <h2 class="text-center mt-5 mb-4">Imágenes de la comunidad</h2>
+    
+    <% if (images && images.length > 0) { %>
+      <div class="gallery-grid">
+        <% images.forEach(image => { %>
+          <div class="gallery-item">
+            <img src="/uploads/gallery/<%= image.image_path %>" alt="Captura de <%= image.username %>">
+            <div class="gallery-item-info">
+              <small class="text-muted">Por: <strong><%= image.username %></strong></small><br>
+              <small class="text-muted"><%= new Date(image.created_at).toLocaleDateString('es-AR') %></small>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <p class="text-center text-muted">Todavía no hay imágenes. Se el primero en subir una!</p>
+    <% } %>
+  </div>
+</div>
+
+<!-- p5.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
+
+<script>
+let video;
+let w = 84;
+let h = 68;
+let escala = 10;
+let invertirColores = false;
+
+function setup() {
+  let canvas = createCanvas(w * escala, h * escala);
+  canvas.parent('sketch-container');
+  
+  video = createCapture(VIDEO);
+  video.size(w, h);
+  video.hide();
+  
+  // Botón guardar
+  let guardarBtn = createButton('Guardar Imagen');
+  guardarBtn.parent('sketch-container');
+  guardarBtn.position(200, height - 200 );
+  guardarBtn.mousePressed(guardarFrame);
+  guardarBtn.class('btn-sketch');
+  
+  // Botón invertir
+  let invertirBtn = createButton('Invertir Colores');
+  invertirBtn.parent('sketch-container');
+  invertirBtn.position(1550, height - 200);
+  invertirBtn.mousePressed(toggleInvertir);
+  invertirBtn.class('btn-sketch');
+}
+
+function draw() {
+  background(220);
+  video.loadPixels();
+  
+  noStroke();
+  
+  for (let i = 0; i < video.width; i++) {
+    for (let j = 0; j < video.height; j++) {
+      let index = (i + j * video.width) * 4;
+      let r = video.pixels[index + 0];
+      let g = video.pixels[index + 1];
+      let b = video.pixels[index + 2];
+      
+      if (invertirColores) {
+        r = 255 - r;
+        g = 255 - g;
+        b = 255 - b;
+      }
+      
+      let c = (r + g + b) / 3;
+      fill(lerpColor(color('#339FFF'), color('#CCE7FF'), c / 255));
+      let tam = map(c, 0, 255, escala, 0);
+      rect(i * escala, j * escala, tam, tam);
+    }
+  }
+}
+
+function guardarFrame() {
+  saveCanvas('captura_video', 'png');
+}
+
+function toggleInvertir() {
+  invertirColores = !invertirColores;
+}
+</script>
+</main>
+
+<%- include('../partials/foot') %>

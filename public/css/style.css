@@ -1,0 +1,215 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
+* {
+   font-family: "Cairo", sans-serif;
+   background-color: rgb(225, 225, 225);
+   color: rgb(104, 158, 213);
+}
+
+body, html{
+    display: flex;
+    flex-direction: column;
+}
+
+main{
+    flex: 1 0 auto;
+}
+
+.main-index {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+h1, h2, h3 {
+    font-family: 'Stack Sans Notch', sans-serif;
+}
+
+
+#tinte {
+  filter: saturate(0.8) hue-rotate(110deg) ;
+
+}
+
+
+/* Estilos para el navbar */
+
+.navbar a {
+   font-weight: 600;
+    color: rgb(127, 171, 219) !important;
+}
+.navbar a:hover {
+    color: rgb(22, 109, 196);
+}
+
+/* Estilos para el footer */
+
+footer {
+    background-color: rgba(240, 240, 240, 0.716);
+    flex-shrink: 0;
+}
+
+/* Estilos para los sketch */
+.sketch-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: center;
+  padding: 40px;
+}
+.sketch-card {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 20px;
+  width: 280px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+
+}
+
+.sketch-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.sketch-img {
+  width: 100%;
+  height: auto;
+  border-radius: 15px;
+  object-fit: cover;
+  transition: opacity 0.3s ease;
+}
+
+.sketch-img:hover {
+  opacity: 0.85;
+}
+
+.btn-sketch {
+    
+  border-color: #5d8ac9;
+    border-radius: 25px;
+    padding: 8px 24px;
+    color: #fff;
+   
+}
+
+.btn-outline-light {
+  color: #fff;
+  border-color: #fff;
+}
+
+.btn-outline-light:hover {
+  background-color: #fff;
+  color: #111;
+}
+
+/* Estilos para la galeria*/
+
+.gallery-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 1. Contenedor del Canvas p5.js */
+#sketch-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+/* Asegura que el canvas se vea bien dentro del contenedor */
+#sketch-container canvas {
+    display: block;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px; /* Espacio para los botones */
+}
+
+/* 2. Formulario de Carga */
+.upload-form {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    margin-bottom: 40px;
+    border-left: 4px solid #339FFF; /* Resalta la sección de acción */
+}
+
+.upload-form h3 {
+    color: #34495e;
+    font-weight: 600;
+}
+
+.upload-form form {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espacio entre el input y el botón */
+}
+
+/* 3. Cuadrícula de Galería */
+.gallery-grid {
+    display: grid;
+    /* Define 4 columnas por defecto en escritorio, auto-ajustables */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px; /* Espacio entre los elementos */
+}
+
+.gallery-item {
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden; /* Oculta partes de la imagen si se ajusta */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gallery-item:hover {
+    transform: translateY(-5px); /* Pequeño efecto hover */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 250px; /* Altura fija para mantener un aspecto uniforme */
+    object-fit: cover; /* Recorta la imagen para cubrir el área sin distorsionarla */
+    display: block;
+}
+
+.gallery-item-info {
+    padding: 10px 15px;
+    line-height: 1.4;
+}
+
+.gallery-item-info strong {
+    color: #339FFF; /* Usa el color primario para el nombre de usuario */
+}
+
+
+/* Estilos para el perfil de usuario */
+
+.container{
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-left: 5px solid #007bff; 
+    max-width: 700px; 
+    text-align: left;
+}
+
+/* Estilo para el Nombre de Usuario */
+.container h4 {
+     margin-top: 1rem;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #343a40; /* Texto oscuro */
+    margin-bottom: 0.5rem;
+    width: 100%; /* Asegurar que ocupe todo el ancho */
+}

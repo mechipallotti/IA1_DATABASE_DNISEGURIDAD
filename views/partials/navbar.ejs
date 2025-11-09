@@ -1,0 +1,33 @@
+<nav class="navbar px-4">
+  <%# Icono de inicio que redirige a la página principal %>
+  <a class="navbar-brand d-flex align-items-center" href="/">
+    <img src="/public/assets/caballo_gif_inicio.gif" alt="Inicio" width="40" height="40" class="me-2" id="tinte">
+  </a>
+
+  <div class="d-flex justify-content-end">
+    <ul class="navbar-nav d-flex flex-row">
+      <li class="nav-item mx-2">
+        <a class="nav-link" href="/obra">Galería</a>
+      </li>
+      <li class="nav-item mx-2">
+        <a class="nav-link" href="/about">About Me</a>
+      </li>
+
+      <% if (!session || !session.user) { %>
+        <li class="nav-item mx-2">
+          <a class="nav-link" href="/login">Iniciar sesión</a>
+        </li>
+        <li class="nav-item mx-2">
+          <a class="nav-link" href="/signup">Registrarse</a>
+        </li>
+      <% } else { %>
+        <li class="nav-item mx-2">
+          <a class="nav-link" href="/user">Perfil</a>
+        </li>
+        <% if(session && session.user){ %>
+  <a class="nav-link" href="/logout">Cerrar sesión</a>
+<% } %>
+      <% } %>
+    </ul>
+  </div>
+</nav>
