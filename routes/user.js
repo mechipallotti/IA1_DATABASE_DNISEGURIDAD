@@ -19,32 +19,32 @@ router.get('/register', (req, res) => {
 
 // --- Registro (POST) ---
 router.post('/register', (req, res) => {
-  console.log('📝 POST /register recibido');
-  console.log('📦 req.body:', req.body);
+  console.log('POST /register recibido');
+  console.log(' req.body:', req.body);
   
   const { username, email, password } = req.body;
 
-  console.log('👤 Datos extraídos:', { username, email, password: password ? '***' : undefined });
+  console.log('Datos extraídos:', { username, email, password: password ? '***' : undefined });
 
   if (!username || !email || !password) {
-    console.log('❌ Faltan campos');
+    console.log('Faltan campos');
     return res.render('signup', { error: 'Todos los campos son obligatorios.' });
   }
 
   // Usar la función que ya tienes en db.js
   if (db.userExists(username)) {
-    console.log('❌ Usuario ya existe');
+    console.log('Usuario ya existe');
     return res.render('signup', { error: 'El usuario ya existe.' });
   }
 
-  console.log('🔐 Hasheando contraseña...');
+  console.log(' Hasheando contraseña...');
   const hashedPassword = bcrypt.hashSync(password, 10);
   
-  console.log('💾 Intentando guardar usuario...');
+  console.log('Intentando guardar usuario...');
   // Usar la función que ya tienes en db.js
   const result = db.addUser(username, email, hashedPassword);
   
-  console.log('📊 Resultado de addUser:', result);
+  console.log('Resultado de addUser:', result);
   
   db.log(); // Ver el estado de la DB
 
@@ -77,7 +77,7 @@ router.post('/login', (req, res) => {
   req.session.userId = username; // En tu DB el username es la PRIMARY KEY
   req.session.username = username;
 
-  console.log('✅ Sesión creada:', req.session);
+  console.log('Sesión creada:', req.session);
 
   // Importante: save() asegura que la sesión se guarde antes de redirigir
   req.session.save((err) => {
