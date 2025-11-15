@@ -7,57 +7,71 @@
   
   <!-- Canvas p5.js -->
   <div id="sketch-container"></div>
-  
-  <!-- Formulario de carga -->
-  <div class="gallery-section">
-    <div class="upload-form">
-      <h3>Subir tu captura a la galería</h3>
-      <p class="text-muted">Guardaste una imagen desde la webcam? Subila acá para compartirla</p>
-      <form action="/obra/sketch3/upload" method="POST" enctype="multipart/form-data" class="mt-3">
-        <input type="file" name="image" accept="image/*" required class="form-control d-inline-block" style="max-width: 400px;">
-        <button type="submit" class="btn btn-primary ms-2">Subir a galería</button>
-      </form>
-    </div>
 
-    <!-- Galería de imágenes -->
-    <h2 class="text-center mt-5 mb-4">Imágenes de la comunidad</h2>
-    
-    <% if (images && images.length > 0) { %>
-      <div class="gallery-grid">
-        <% images.forEach(image => { %>
-          <div class="gallery-item">
-            <img src="/uploads/gallery/<%= image.image_path %>" alt="Captura de <%= image.username %>">
-            <div class="gallery-item-info">
-              <small class="text-muted">Por: <strong><%= image.username %></strong></small><br>
-              <small class="text-muted"><%= new Date(image.created_at).toLocaleDateString('es-AR') %></small>
-            </div>
-          </div>
-        <% }) %>
-      </div>
+  <!-- Formulario para subir imágenes -->
+<div class="container mt-5">
+  <h3>Subí tu imagen a la galería colectiva</h3>
+  <form action="/obra/sketch3/upload" method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label for="userFiles" class="form-label">Elegí una imagen</label>
+      <input type="file" name="userFiles" id="userFiles" class="form-control" accept="image/png, image/jpeg" required>
+    </div>
+    <div class="mb-3">
+      <label for="descImg" class="form-label">Descripción</label>
+      <input type="text" name="descImg" id="descImg" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Subir imagen</button>
+  </form>
+</div>
+
+<!-- Galería de imágenes subidas -->
+<div class="container mt-5">
+  <h3>Imágenes en la galería colectiva</h3>
+  <div class="row">
+    <% if (locals.images && images.length > 0) { %>
+      <% for(let img of images) { %>
+        <div class="col-md-4 mb-4">
+          <img src="/uploads/<%= img.filehash %>" class="img-fluid" alt="<%= img.filedesc %>">
+          <p class="text-muted mt-2"><strong><%= img.username %>:</strong> <%= img.filedesc %></p>
+        </div>
+      <% } %>
     <% } else { %>
-      <p class="text-center text-muted">Todavía no hay imágenes. Se el primero en subir una!</p>
+      <p>Todavía no hay imágenes en la galería. ¡Sé el primero en subir una!</p>
     <% } %>
   </div>
 </div>
+  
+
 
 <!-- p5.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
 
 <script>
-let video;
-let w = 84;
-let h = 68;
-let escala = 10;
-let invertirColores = false;
+let angle = 0;
+let radius = 1;
+let spacing = 0.005; // velocidad de expansión
+let step = 0.05;     // paso angular
+let cam;
+let jsonData = [];
+  
+function preload() {}
+  loadJSON("/obra/data", data => {
+    for(let obj of data) {
+      obj.img = loadImage(obj.filehash);  // Cargamos la imagen desde el servidor en preload porque son acciones async.
+      jsonData.push(obj);  // Se guardan los objetos en un array.
+    }
+  });
 
 function setup() {
-  let canvas = createCanvas(w * escala, h * escala);
+  let canvas = createCanvas(600, 600);
   canvas.parent('sketch-container');
-  
-  video = createCapture(VIDEO);
-  video.size(w, h);
-  video.hide();
+
+  cam = createCapture(VIDEO);
+  cam.size(600, 600);
+  cam.hide();
+  strokeWeight(1.5);
+  noFill();
   
   // Botón guardar
   let guardarBtn = createButton('Guardar Imagen');
@@ -75,30 +89,47 @@ function setup() {
 }
 
 function draw() {
-  background(220);
-  video.loadPixels();
-  
-  noStroke();
-  
-  for (let i = 0; i < video.width; i++) {
-    for (let j = 0; j < video.height; j++) {
-      let index = (i + j * video.width) * 4;
-      let r = video.pixels[index + 0];
-      let g = video.pixels[index + 1];
-      let b = video.pixels[index + 2];
-      
-      if (invertirColores) {
-        r = 255 - r;
-        g = 255 - g;
-        b = 255 - b;
+  background(255);
+  cam.loadPixels();
+
+  push();
+  translate(width / 2, height / 2);
+  let a = angle;
+  let r = radius;
+
+  for (let i = 0; i < 70000; i++) {
+    let x = cos(a) * r;
+    let y = sin(a) * r;
+
+    // coordenadas espejo para la cámara
+    let px = floor(width - (width / 2 + x));
+    let py = floor(height / 2 + y);
+
+    if (px >= 0 && px < cam.width && py >= 0 && py < cam.height) {
+      let index = (py * cam.width + px) * 4;
+      let bright = (cam.pixels[index] + cam.pixels[index + 1] + cam.pixels[index + 2]) / 3;
+
+       // color y opacidad según brillo
+      if (bright < 100) {
+        stroke(0, 70, 255, random(180, 255));
+        strokeWeight(random(1.2, 2));
+      } else if (bright < 180) {
+        stroke(100, 140, 255, random(80, 180));
+        strokeWeight(random(0.8, 1.5));
+      } else {
+        stroke(255, 255, 255, 0);
+        strokeWeight(0);
       }
-      
-      let c = (r + g + b) / 3;
-      fill(lerpColor(color('#339FFF'), color('#CCE7FF'), c / 255));
-      let tam = map(c, 0, 255, escala, 0);
-      rect(i * escala, j * escala, tam, tam);
+      point(x, y);
     }
+
+    r += spacing;
+    a += 0.05 / sqrt(r + 10);
   }
+  pop();
+
+  angle += 0.001; // ligera rotación del patrón
+
 }
 
 function guardarFrame() {
@@ -106,7 +137,8 @@ function guardarFrame() {
 }
 
 function toggleInvertir() {
-  invertirColores = !invertirColores;
+  invertirColores
+  = !invertirColores;
 }
 </script>
 </main>

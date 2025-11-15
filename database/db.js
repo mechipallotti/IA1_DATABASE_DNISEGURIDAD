@@ -10,20 +10,13 @@ const db = new Database('users.db', { verbose: console.log });
 const filePath = path.join(__dirname, 'create_users.sql');
 const file = fs.readFileSync(filePath, 'utf-8');
 
-// Carga el script sql para crear la tabla gallery
-const galleryFilePath = path.join(__dirname, 'create_users.sql');
-const galleryFile = fs.readFileSync(galleryFilePath, 'utf-8');
-
-// Crea las tablas si no existen
+// Crea la tabla si no existe, `exec` es lo mismo que `run` pero se usa para hacer varias cosas de uan.
 db.exec(file);
-db.exec(galleryFile);
 
-// -------------
-// Funciones para exportar y usar en otros módulos.
-// -------------
 
 /**
- * Imprime el contenido de la base de datos.*/
+ * Imprime el contenido de la base de datos.
+ */
 exports.log = () => {
     let data = db.prepare('SELECT rowid, * FROM users').all();
     console.log('Tabla users', data);
@@ -32,103 +25,124 @@ exports.log = () => {
 };
 
 /**
- * Comprueba si el nombre de usuario existe en la base de datos.*/
+ * Comprueba si el nombre de usuario existe en la base de datos.
+ *
+ * @param {string} username
+ * @returns boolean
+ */
 exports.userExists = (username) => {
-    const stmt = db.prepare('SELECT username FROM users WHERE username=?');
-    const value = stmt.get(username);
-    return !!value; // Devuelve true/false
+    let stmt = db.prepare('SELECT username FROM users WHERE username=?');
+    let value = stmt.get(username);
+    if(!value) return false;
+    else return true;
 };
 
 /**
- * Agrega un nuevo usuario en la base de datos. */
+ * Agrega un nuevo usuario en la base de datos.
+ * ¡El usuario *no* debe existir!
+ *
+ * @param {string} username
+ * @param {string} email
+ * @param {string} hash
+ */
 exports.addUser = (username, email, hash) => {
-    try {
-        const stmt = db.prepare("INSERT INTO users (username, email, hash) VALUES (?, ?, ?)");
-        const result = stmt.run(username, email, hash);
-        console.log('Usuario creado:', { username, email, changes: result.changes });
-        return true;
-    } catch (error) {
-        console.error('ERROR al crear usuario:', error.message);
-        return false;
-    }
+    stmt = db.prepare("INSERT INTO users VALUES (?, ?, ?, NULL)");
+    stmt.run(username, email, hash);
 }
 
 /**
- * Devuelve el hash del usuario. */
+ * Devuelve el hash del usuario.
+ *
+ * @param {string} username
+ * @returns boolean
+ */
 exports.getHash = (username) => {
-    const stmt = db.prepare('SELECT hash FROM users WHERE username=?');
-    const user = stmt.get(username);
-    return user ? user.hash : null;
+    let stmt = db.prepare('SELECT hash FROM users WHERE username=?');
+    return stmt.get(username).hash;
+}
+
+
+/**
+ * Agrega la ruta de una imagen a la tabla de imágenes
+ * junto con el usuario al que pertenece.
+ *
+ * @param {string} username
+ * @param {string} path
+ */
+exports.addUserImage = (username, path, filename, filedesc) => {
+    let stmt = db.prepare("INSERT INTO user_images VALUES(?, ?, ?, ?)");
+    stmt.run(username, path, filename, filedesc);
 }
 
 /**
- * Obtiene datos completos de un usuario */
-exports.getUser = (username) => {
-    const stmt = db.prepare('SELECT * FROM users WHERE username=?');
-    return stmt.get(username);
+ * Comprueba la imagen existe en la base de datos para el usuario.
+ *
+ * @param {string} username
+ * @returns boolean
+ */
+exports.userImagenExists = (username, path) => {
+    let stmt = db.prepare('SELECT filehash FROM user_images WHERE username=? AND filehash=?');
+    let value = stmt.get(username, path);
+    if(!value) return false;
+    else return true;
+};
+
+/**
+ * Borra una de las imágenes del usuario.
+ * ¡EL ARCHIVO REAL HAY QUE BORRARLO A PARTE CON fs o manualmente!
+ *
+ * @param {string} username
+ * @param {string} path
+ */
+exports.deleteUserImage = (username, path) => {
+    let stmt = db.prepare('DELETE FROM user_images WHERE username=? AND filehash=?');
+    stmt.run(username, path);
 }
 
-// -------------
-// IMAGENES DE USUARIO 
-// -------------
-
-// Agrega imagen asociada a un usuario
-exports.addUserImage = (username, filepath, filename, description) => {
-    const stmt = db.prepare(
-        'INSERT INTO user_images (username, filepath, filename, filedesc) VALUES (?, ?, ?, ?)'
-    );
-    stmt.run(username, filepath, filename, description);
-};
-
-// Comprueba si una imagen existe
-exports.userImageExists = (username, filepath) => {
-    const stmt = db.prepare('SELECT filepath FROM user_images WHERE username=? AND filepath=?');
-    return !!stmt.get(username, filepath);
-};
-
-// Borra una imagen de un usuario
-exports.deleteUserImage = (username, filepath) => {
-    const stmt = db.prepare('DELETE FROM user_images WHERE username=? AND filepath=?');
-    stmt.run(username, filepath);
-};
-
-// Devuelve todas las imágenes de un usuario
+/**
+ * Retorna un array con las rutas de todas
+ * las imágenes del usuario.
+ *
+ * @param {string} username
+ * @returns array
+ */
 exports.getAllUserImages = (username) => {
-    const stmt = db.prepare('SELECT * FROM user_images WHERE username=?');
+    let stmt = db.prepare('SELECT filehash FROM user_images WHERE username=?');
     return stmt.all(username);
-};
+}
 
-// Datos para sketches o usos especiales
-exports.getSketchData = (username) => {
-    const stmt = db.prepare('SELECT * FROM user_images WHERE username=?');
-    return stmt.all(username);
-};
-// -------------
-// GALERIA COLECTIVA
-// -------------
-
-// Agregar imagen a la galería
-exports.addToGallery = (username, imagePath) => {
-    const stmt = db.prepare('INSERT INTO gallery (username, image_path) VALUES (?, ?)');
-    return stmt.run(username, imagePath);
-};
-
-// Obtener todas las imágenes de la galería
-exports.getAllGalleryImages = () => {
-    const stmt = db.prepare('SELECT * FROM gallery ORDER BY created_at DESC');
+exports.getSketchData = () => {
+    let stmt = db.prepare('SELECT * FROM user_images');
     return stmt.all();
-};
+}
 
-// Borrar imagen de galería
-exports.deleteFromGallery = (id) => {
-    const stmt = db.prepare('DELETE FROM gallery WHERE id = ?');
-    return stmt.run(id);
-};
 
-// -----------------------------------------------
-// CIERRE ORDENADO DE LA BASE
-// -----------------------------------------------
+/**
+ * Actualiza la foto de perfil del usuario
+ * 
+ * @param {string} username
+ * @param {string} filename
+ */
+exports.updateProfilePicture = (username, filename) => {
+    let stmt = db.prepare('UPDATE users SET profile_picture = ? WHERE username = ?');
+    stmt.run(filename, username);
+}
+
+/**
+ * Obtiene la foto de perfil del usuario
+ * 
+ * @param {string} username
+ * @returns string | null
+ */
+exports.getProfilePicture = (username) => {
+    let stmt = db.prepare('SELECT profile_picture FROM users WHERE username = ?');
+    let result = stmt.get(username);
+    return result ? result.profile_picture : null;
+}
+
+// Siempre cerrar la conexión, apagar, al terminar.
+// ste código sirve luego para el servidor express.
 process.on('exit', () => db.close());
-process.on('SIGHUP', () => process.exit());
-process.on('SIGINT', () => process.exit());
-process.on('SIGTERM', () => process.exit());
+process.on('SIGHUP', () => process.exit()); // Cierre de la terminal.
+process.on('SIGINT', () => process.exit()); // Ctrl-C.
+process.on('SIGTERM', () => process.exit()); // Ctrl-D.

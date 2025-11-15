@@ -50,8 +50,8 @@ router.get('/signup', notlogged, (req, res, next) => {
 });
 
 router.post('/signup', notlogged, (req, res, next) => {
-    console.log('📝 POST /signup recibido');
-    console.log('📦 req.body:', req.body);
+    console.log('POST /signup recibido');
+    console.log(' req.body:', req.body);
     
     const { username, email, password } = req.body;
 
@@ -149,14 +149,17 @@ router.post('/login', notlogged, (req, res, next) => {
 router.get('/user', requireLogin, (req, res, next) => {
     const username = req.session.user;
     const images = db.getAllUserImages(username);
+    const profilePic = db.getProfilePicture(username); // ← Nuevo
     
     res.render('user', { 
         pageTitle: 'Mi perfil',
-        user: { username },
+        user: { 
+            username,
+            profilePicture: profilePic // ← Nuevo
+        },
         images
     });
 });
-
 /**
  * Logout
  */

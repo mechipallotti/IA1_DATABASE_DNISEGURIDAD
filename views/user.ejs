@@ -1,32 +1,34 @@
 <%- include('partials/head', { pageTitle: 'Mi Perfil' }) %>
- <%- include('partials/navbar') %>
+    <%- include('partials/navbar') %>
         <main>
+             <img src="/public/assets/logueo_sims.png" alt="logeo sims" width="50em" class="mb-4 justify-content-center text-center" id="tinte">
             <div class="container mt-5">
-             <img src="/public/assets/logueo_sims.png" alt="logeo sims" width="10%" class="mb-4" id="tinte">
+                <% if (user.profilePicture) { %>
+                    <img src="/uploads/<%= user.profilePicture %>" alt="Foto de perfil" width="200" class=" mb-4">
+                    <% } else { %>
+                        <img src="/public/assets/logueo_sims.png" alt="logeo sims" width="10%" class="mb-4" id="tinte">
+                        <% } %>
+                            <div class="row justify-content-center">
+                                <h4>
+                                    <%= user.username %>
+                                </h4>
+                                <p class="text-muted">Miembro desde <%= new Date().toLocaleDateString('es-AR') %>
+                                        <p><strong>Nombre:</strong>
+                                            <%= user.username %>
 
-                <div class="row justify-content-center">
-                    <h4>
-                        <%= user.username %>
-                    </h4>
-                    <p class="text-muted">Miembro desde <%= new Date().toLocaleDateString('es-AR') %>
-                            <p><strong>Nombre:</strong>
-                                <%= user.username %>
-                    
-                            </p>
-                            <p><strong>Email:</strong>
-                                <%= user.email %>
-                            </p>
-
-                    </p>
-                </div>
+                                        </p>
+                                        <p><strong>Email:</strong>
+                                            <%= user.email %>
+                                        </p>
+                                </p>
+                            </div>
             </div>
-
             <!-- Opciones de cuenta -->
-
             <div class="card-body justify-content-center text-center mt-4">
                 <h5 class="card-title mb-3">Opciones de cuenta</h5>
+                <a href="/user/upload" class="btn btn-primary mb-2">Subir imágenes</a>
                 <a href="/logout" class="btn btn-outline-danger">Cerrar sesión</a>
             </div>
             </div>
-
         </main>
+        <%- include('partials/foot') %>

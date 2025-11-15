@@ -1,19 +1,27 @@
-<%- include('partials/head') %>
-    <h1>Subida de archivos</h1>
+<%- include('partials/head', { pageTitle: 'Subir foto de perfil' }) %>
+<%- include('partials/navbar') %>
 
+<main class="container mt-5">
+    <h1>Subir foto de perfil</h1>
+    
+    <!-- Mostrar foto actual si existe -->
+    <% if (locals.profilePicture) { %>
+        <div class="mb-4">
+            <h3>Foto actual:</h3>
+            <img src="/uploads/<%= profilePicture %>" alt="Foto de perfil actual" width="200" class="rounded-circle">
+        </div>
+    <% } %>
+    
+    <!-- Formulario para subir nueva foto -->
     <form action="/user/upload" method="POST" enctype="multipart/form-data">
-        <div>
-            <label for="datosID">Archivos de imagen</label>
-            <input type="file" name="userFiles" id="datosID" accept="image/png, image/jpeg" multiple required>
+        <div class="mb-3">
+            <label for="userFiles" class="form-label">Elegí tu foto de perfil</label>
+            <input type="file" name="userFiles" id="userFiles" class="form-control" accept="image/png, image/jpeg" required>
+            <small class="text-muted">Solo se guardará 1 imagen como foto de perfil</small>
         </div>
-        <div>
-            <label for="descID">Descripción</label>
-            <input type="text" name="descImg" id="descID" required>
-        </div>
-        <div>
-            <input type="submit" name="submit">
-        </div>
+        <button type="submit" class="btn btn-primary">Actualizar foto de perfil</button>
+        <a href="/user" class="btn btn-secondary">Volver al perfil</a>
     </form>
+</main>
 
-<%- include('partials/galeria') %>
 <%- include('partials/foot') %>

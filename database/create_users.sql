@@ -6,14 +6,15 @@ CREATE TABLE IF NOT EXISTS users
 (
     username varchar(255) PRIMARY KEY,
     email varchar(255) NOT NULL,
-    hash varchar(255) NOT NULL
+    hash varchar(255) NOT NULL,
+    profile_picture varchar(255)
 );
 
-CREATE TABLE IF NOT EXISTS gallery
+CREATE TABLE IF NOT EXISTS user_images
 (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username VARCHAR(255) NOT NULL,
-    image_path VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    username varchar(255) NOT NULL,
+    filehash varchar(255) NOT NULL UNIQUE,
+    filename varchar(255),
+    filedesc TEXT,
     FOREIGN KEY(username) REFERENCES users(username) ON DELETE CASCADE
 );
