@@ -1,8 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const db = require('../database/db.js');
-const multer = require('multer');
-const path = require('path');
 
 const router = express.Router();
 
@@ -75,7 +73,7 @@ router.post('/signup', notlogged, (req, res, next) => {
     const hash = bcrypt.hashSync(password, 10);
     
     console.log(' Guardando usuario...');
-    const result = db.addUser(username, email, hash);
+    db.addUser(username, email, hash);
     
     console.log(' Usuario guardado:', result);
     db.log();
@@ -148,16 +146,16 @@ router.post('/login', notlogged, (req, res, next) => {
  */
 router.get('/user', requireLogin, (req, res, next) => {
     const username = req.session.user;
-    const images = db.getAllUserImages(username);
-    const profilePic = db.getProfilePicture(username); // ← Nuevo
+    const profilePic = db.getProfilePicture(username);
+    const userData = db.getUserData(username); // ← Solo para obtener el email
     
     res.render('user', { 
         pageTitle: 'Mi perfil',
         user: { 
-            username,
-            profilePicture: profilePic // ← Nuevo
+            username: username,
+            email: userData.email,  // ← Agregamos el email
+            profilePicture: profilePic
         },
-        images
     });
 });
 /**

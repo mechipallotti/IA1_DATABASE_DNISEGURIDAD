@@ -140,6 +140,10 @@ exports.getProfilePicture = (username) => {
     return result ? result.profile_picture : null;
 }
 
+exports.getUserData = (username) => {
+    let stmt = db.prepare('SELECT username, email, profile_picture FROM users WHERE username = ?');
+    return stmt.get(username);
+}
 // Siempre cerrar la conexión, apagar, al terminar.
 // ste código sirve luego para el servidor express.
 process.on('exit', () => db.close());

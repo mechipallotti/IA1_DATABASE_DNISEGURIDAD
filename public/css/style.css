@@ -126,7 +126,6 @@ footer {
     border-radius: 12px;
 }
 
-/* Asegura que el canvas se vea bien dentro del contenedor */
 #sketch-container canvas {
     display: block;
     border-radius: 8px;
@@ -135,14 +134,13 @@ footer {
     margin-bottom: 20px; /* Espacio para los botones */
 }
 
-/* 2. Formulario de Carga */
 .upload-form {
     background-color: #ffffff;
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     margin-bottom: 40px;
-    border-left: 4px solid #339FFF; /* Resalta la sección de acción */
+    border-left: 4px solid #339FFF; 
 }
 
 .upload-form h3 {
@@ -153,13 +151,12 @@ footer {
 .upload-form form {
     display: flex;
     align-items: center;
-    gap: 10px; /* Espacio entre el input y el botón */
+    gap: 10px; 
 }
 
 /* 3. Cuadrícula de Galería */
 .gallery-grid {
     display: grid;
-    /* Define 4 columnas por defecto en escritorio, auto-ajustables */
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 25px; /* Espacio entre los elementos */
 }
@@ -202,6 +199,7 @@ footer {
     border-left: 5px solid #007bff; 
     max-width: 700px; 
     text-align: left;
+
 }
 
 /* Estilo para el Nombre de Usuario */
@@ -213,3 +211,42 @@ footer {
     margin-bottom: 0.5rem;
     width: 100%; /* Asegurar que ocupe todo el ancho */
 }
+
+.card-botones{
+   margin-left: 200px;
+   margin-right: 200px;
+   margin-bottom: 40px;
+   padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-left: 5px solid #007bff; 
+   justify-content: center;
+   align-items: center;
+   text-align: center;
+  }
+
+  .conteiner-galeria{
+    margin-left: 100px;
+    margin-right: 100px;
+    margin-bottom: 40px;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+   }
+  
+   .about-me-img{
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    max-width: 300px; 
+    height: auto;
+   }
+.conteiner-about-me{
+    margin-left: 200px;
+    margin-right: 200px;
+    margin-bottom: 40px;
+    padding: 20px;
+     border-radius: 15px;
+     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+     display: flex;
+   }
