@@ -1,224 +1,47 @@
 <%- include('../partials/head', { pageTitle: 'Galería Colectiva' }) %>
 <%- include('../partials/navbar') %>
-<main>
-  <h1 class="text-center mt-4 mb-4">Galería Colectiva - Webcam Pixelada</h1>
-  
-  <!-- Canvas p5.js -->
-  <div id="sketch-container"></div>
-
-  <!-- Formulario para subir imágenes -->
-<div class="card-botones mt-5">
-  <h3>Subí tu imagen a la galería colectiva</h3>
-  <form action="/obra/sketch3/upload" method="POST" enctype="multipart/form-data">
-    <div class="mb-3">
-      <label for="userFiles" class="form-label">Elegí una imagen</label>
-      <input type="file" name="userFiles" id="userFiles" class="form-control" accept="image/png, image/jpeg" required>
-    </div>
-    <div class="mb-3">
-      <label for="descImg" class="form-label">Descripción</label>
-      <input type="text" name="descImg" id="descImg" class="form-control" required>
-    </div>
-    <button type="submit" class="btn btn-primary">Subir imagen</button>
-  </form>
-</div>
-
-<!-- Galería de imágenes subidas -->
-<div class="conteiner-galeria mt-5">
-  <h3>Imágenes en la galería colectiva</h3>
-  <div class="row">
-    <% if (locals.images && images.length > 0) { %>
-      <% for(let img of images) { %>
-        <div class="col-md-4 mb-4">
-          <img src="/uploads/<%= img.filehash %>" class="img-fluid" alt="<%= img.filedesc %>">
-          <p class="text-muted mt-2"><strong><%= img.username %>:</strong> <%= img.filedesc %></p>
-        </div>
-      <% } %>
-    <% } else { %>
-      <p>Todavía no hay imágenes en la galería. ¡Sé el primero en subir una!</p>
-    <% } %>
-  </div>
-</div>
-  
-
-
-<!-- p5.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
 
-<script>
-let angle = 0;
-let radius = 1;
-let spacing = 0.005;
-let step = 0.05;
-let cam;
-let jsonData = [];
-let patronActual = 0;
-let numPatrones = 3; 
+<main>
+  <h1 class="text-center mt-4 mb-4">Galería Colectiva - Webcam Pixelada</h1>
 
-function preload() {
-  loadJSON("/obra/data", data => {
-    for(let obj of data) {
-      obj.img = loadImage('/uploads/' + obj.filehash);  // ← Agregué /uploads/
-      jsonData.push(obj);
-    }
-  });
-}
+  <div id="sketch-container"></div>
 
-function setup() {
-  let canvas = createCanvas(600, 600);
-  canvas.parent('sketch-container');
-  cam = createCapture(VIDEO);
-  cam.size(600, 600);
-  cam.hide();
-  strokeWeight(1.5);
-  noFill();
-  
-  let guardarBtn = createButton('Guardar Imagen');
-  guardarBtn.parent('sketch-container');
-  guardarBtn.position(200, height - 200);
-  guardarBtn.mousePressed(guardarFrame);
-  guardarBtn.class('btn-sketch');
-  
-  let cambiarPatronBtn = createButton('Cambiar Patrón');
-  cambiarPatronBtn.parent('sketch-container');
-  cambiarPatronBtn.position(1200, height - 200);
-  cambiarPatronBtn.mousePressed(cambiarPatron);
-  cambiarPatronBtn.class('btn-sketch');
-}
+  <!-- Formulario para subir imágenes -->
+  <div class="card-botones mt-5">
+    <h3>Subí tu imagen a la galería colectiva</h3>
+    <form action="/obra/sketch3/upload" method="POST" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label for="userFiles" class="form-label">Elegí una imagen</label>
+        <input type="file" name="userFiles" id="userFiles" class="form-control" accept="image/png, image/jpeg" required>
+      </div>
+      <div class="mb-3">
+        <label for="descImg" class="form-label">Descripción</label>
+        <input type="text" name="descImg" id="descImg" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Subir imagen</button>
+    </form>
+  </div>
 
-function draw() {
-  // Ejecutar el patrón correspondiente
-  if (patronActual === 0) {
-    background(255);
-    cam.loadPixels();
-    push();
-    translate(width / 2, height / 2);
-    dibujarPatronEspiral();
-    pop();
-  } else if (patronActual === 1) {
-    background(255);
-    cam.loadPixels();
-    push();
-    translate(width / 2, height / 2);
-    dibujarPatronLineas();
-    pop();
-  } else if (patronActual === 2) {
-    dibujarPatronPixeles();
-  }
-  
-  angle += 0.001;
-}
-
-// PATRÓN 1: Espiral original
-function dibujarPatronEspiral() {
-  let a = angle;
-  let r = radius;
-  for (let i = 0; i < 90000; i++) {
-    let x = cos(a) * r;
-    let y = sin(a) * r;
-    let px = floor(width - (width / 2 + x));
-    let py = floor(height / 2 + y);
-    
-    if (px >= 0 && px < cam.width && py >= 0 && py < cam.height) {
-      let index = (py * cam.width + px) * 4;
-      let bright = (cam.pixels[index] + cam.pixels[index + 1] + cam.pixels[index + 2]) / 3;
-      bright = map(bright, 0, 255, 20, 200);
-      
-      aplicarColorBrillo(bright);
-      point(x, y);
-    }
-    r += spacing;
-    a += 0.05 / sqrt(r + 10);
-  }
-}
-
-// PATRÓN 2: Líneas radiales
-function dibujarPatronLineas() {
-  let numLineas = 360;
-  for (let i = 0; i < numLineas; i++) {
-    let a = map(i, 0, numLineas, 0, TWO_PI) + angle;
-    
-    for (let r = 0; r < 400; r += 2) {
-      let x = cos(a) * r;
-      let y = sin(a) * r;
-      
-      let px = floor(width - (width / 2 + x));
-      let py = floor(height / 2 + y);
-      
-if (px >= 0 && px < cam.width && py >= 0 && py < cam.height) {
-  let index = (py * cam.width + px) * 4;
-  let bright = (cam.pixels[index] + cam.pixels[index + 1] + cam.pixels[index + 2]) / 3;
-  bright = map(bright, 0, 255, 50, 180);  // Rango más estrecho
-        
-        aplicarColorBrillo(bright);
-        point(x, y);
-      }
-    }
-  }
-}
-
-// PATRÓN 4: Pixeles/cuadrados
-function dibujarPatronPixeles() {
-  background(220);
-  cam.loadPixels();
-  
-  let escala = 10;
-  let w = floor(width / escala);
-  let h = floor(height / escala);
-  
-  push();
-  noStroke();
-  
-  for (let i = 0; i < w; i++) {
-    for (let j = 0; j < h; j++) {
-      let px = floor(map(i, 0, w, 0, cam.width));
-      let py = floor(map(j, 0, h, 0, cam.height));
-      
-      if (px >= 0 && px < cam.width && py >= 0 && py < cam.height) {
-        let index = (py * cam.width + px) * 4;
-        let r = cam.pixels[index + 0];
-        let g = cam.pixels[index + 1];
-        let b = cam.pixels[index + 2];
-        
-        let c = (r + g + b) / 3;
-        
-        fill(lerpColor(color(34, 79, 255), color(185, 222, 250), c / 255));
-        let tam = map(c, 0, 255, escala, 0);
-        rect(i * escala, j * escala, tam, tam);
-      }
-    }
-  }
-  pop();
-}
-
-// Función auxiliar para aplicar colores según brillo
-function aplicarColorBrillo(bright) {
-  if (bright < 70) {
-    stroke(20, 60, 200, 120);
-    strokeWeight(1.8);
-  } else if (bright < 110) {
-    stroke(34, 79, 255, 100);
-    strokeWeight(1.5);
-  } else if (bright < 150) {
-    stroke(34, 136, 250, 80);
-    strokeWeight(1);   
-  } else if (bright < 180) {
-    stroke(100, 180, 240, 60);
-    strokeWeight(0.6);
-  } else {
-    stroke(185, 222, 250, 40);
-    strokeWeight(0.3);
-  }
-}
-
-function cambiarPatron() {
-  patronActual = (patronActual + 1) % numPatrones;
-}
-
-function guardarFrame() {
-  saveCanvas('captura_video', 'png');
-}
-</script>
+  <!-- Galería de imágenes subidas -->
+  <div class="conteiner-galeria mt-5">
+    <h3>Imágenes en la galería colectiva</h3>
+    <div class="row">
+      <% if (locals.images && images.length > 0) { %>
+        <% for(let img of images) { %>
+          <div class="col-md-4 mb-4">
+            <img src="/uploads/<%= img.filehash %>" class="img-fluid" alt="<%= img.filedesc %>">
+            <p class="text-muted mt-2"><strong><%= img.username %>:</strong> <%= img.filedesc %></p>
+          </div>
+        <% } %>
+      <% } else { %>
+        <p>Todavía no hay imágenes en la galería. ¡Sé el primero en subir una!</p>
+      <% } %>
+    </div>
+  </div>
 </main>
+
+<script src="/public/p5/obra/sketch3.js"></script>
 
 <%- include('../partials/foot') %>
